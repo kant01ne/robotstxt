@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -13,13 +14,20 @@ import (
 var httpClient = &http.Client{}
 
 func main() {
+
+	// concurrency flag
+	var concurrency int
+	flag.IntVar(&concurrency, "c", 20, "set the concurrency level")
+
+	flag.Parse()
+
 	sc := bufio.NewScanner(os.Stdin)
 
 	var wg sync.WaitGroup
 
 	jobs := make(chan string)
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < concurrency; i++ {
 		wg.Add(1)
 
 		go func() {
@@ -38,17 +46,17 @@ func main() {
 
 				resp, err := httpClient.Do(req)
 				if err != nil {
-					return
+					continue
 				}
 				if resp.Body == nil {
-					return
+					continue
 				}
 				defer resp.Body.Close()
 
 				// always read the full body so we can re-use the tcp connection
 				b, err := ioutil.ReadAll(resp.Body)
 				if err != nil {
-					return
+					continue
 				}
 
 				body := string(b)
