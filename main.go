@@ -67,7 +67,11 @@ func main() {
 					p := strings.Split(line, "llow: ") // Disallow: && Allow:
 					if len(p) == 2 {
 						path := p[1]
-						fmt.Printf("%s%s\n", host, path)
+						if strings.HasPrefix(path, "https://") || strings.HasPrefix(path, "http://") {
+							fmt.Printf("%s\n", path)
+						} else {
+							fmt.Printf("%s%s\n", host, path)
+						}
 					}
 				}
 			}
