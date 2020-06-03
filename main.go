@@ -16,8 +16,13 @@ var httpClient = &http.Client{}
 func main() {
 
 	// concurrency flag
-	var concurrency int
-	flag.IntVar(&concurrency, "c", 20, "set the concurrency level")
+	var (
+		concurrency int
+		wildcard    bool
+	)
+
+	flag.IntVar(&concurrency, "c", 20, "Set the concurrency level")
+	flag.BoolVar(&wildcard, "w", true, "Should include wildcards")
 
 	flag.Parse()
 
@@ -64,13 +69,21 @@ func main() {
 				lines := bufio.NewScanner(strings.NewReader(body))
 				for lines.Scan() {
 					line := lines.Text()
+					if !wildcard && strings.Contains(line, "*") {
+						continue
+					}
+
 					p := strings.Split(line, "llow: ") // Disallow: && Allow:
 					if len(p) == 2 {
 						path := p[1]
 						if strings.HasPrefix(path, "https://") || strings.HasPrefix(path, "http://") {
 							fmt.Printf("%s\n", path)
 						} else {
-							fmt.Printf("%s%s\n", host, path)
+							if strings.HasPrefix(path, "/") {
+								fmt.Printf("%s%s\n", host, path)
+							} else {
+								fmt.Printf("%s/%s\n", host, path)
+							}
 						}
 					}
 				}
