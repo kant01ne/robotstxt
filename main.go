@@ -9,6 +9,11 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
+)
+
+const (
+	userAgent = "Mozilla/5.0 (compatible; robotxtxt; +https://github.com/NkxxkN/robotstxt)"
 )
 
 var httpClient = &http.Client{}
@@ -17,14 +22,24 @@ func main() {
 
 	// concurrency flag
 	var (
+		httpClient  http.Client
 		concurrency int
+		to          int
 		wildcard    bool
 	)
 
 	flag.IntVar(&concurrency, "c", 20, "Set the concurrency level")
 	flag.BoolVar(&wildcard, "w", true, "Should include wildcards")
+	flag.IntVar(&to, "t", 10000, "timeout (milliseconds)")
 
 	flag.Parse()
+
+	// make an actual time.Duration out of the timeout
+	timeout := time.Duration(to * 1000000)
+
+	httpClient = http.Client{
+		Timeout: timeout,
+	}
 
 	sc := bufio.NewScanner(os.Stdin)
 
@@ -47,7 +62,7 @@ func main() {
 					return
 				}
 
-				req.Header.Add("User-Agent", "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.100 Safari/537.36")
+				req.Header.Add("User-Agent", userAgent)
 
 				resp, err := httpClient.Do(req)
 				if err != nil {

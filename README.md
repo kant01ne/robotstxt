@@ -2,7 +2,14 @@
 
 `robotstxt` is a tool that will build URLs based on the robots.txt file of the host provided.
 
-# Usage example
+
+# Install
+
+```
+▶ go get -u github.com/NkxxkN/robotstxt
+```
+
+# Basic Usage
 
 ```
 ▶ echo "https://yahoo.com" | robotstxt
@@ -21,13 +28,22 @@ https://yahoo.com/fpjs
 https://yahoo.com/myjs
 ```
 
+## Concurrency
 
-# Install
+You can set the concurrency level with the -c flag (default = 20):
 
 ```
-▶ go get -u github.com/NkxxkN/robotstxt
+▶ cat domains.txt | robotstxt -c 50
+```
+
+## Timeout
+
+You can change the timeout by using the -t flag and specifying a timeout in milliseconds (default = 10000):
+
+```
+▶ cat domains.txt | robotstxt -t 20000
 ```
 
 # Credits
 
-This tool was 100% inspired from [TomNomNom](https://github.com/tomnomnom) tools.
+This tool was 100% inspired from [TomNomNom](https://github.com/tomnomnom) tools <3
